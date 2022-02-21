@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
 
 import "Script.js" as Scripts
 
@@ -36,7 +37,7 @@ Window {
             id: refreshButton
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            text: qsTr("↺")
+            text: qsTr("Refresh")
             onClicked: Scripts.loadData()
         }
     }
@@ -47,16 +48,21 @@ Window {
         Rectangle {
             width: entriesListView.width
             implicitHeight: titleLabel.height
-
-            Label {
-                id: titleLabel
-                text: title
-            }
             
-            Label {
-                id: counterLabel
-                text: counter
-                anchors.right: parent.right
+            RowLayout {
+                anchors.fill: parent
+            
+                Label {
+                    id: titleLabel
+                    text: title
+                    wrapMode: Text.Wrap
+                    Layout.fillWidth: true
+                }
+                
+                Label {
+                    id: counterLabel
+                    text: counter
+                }
             }
         }
     }
