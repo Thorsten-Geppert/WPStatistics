@@ -1,6 +1,8 @@
 #include "StatisticsWeb.h"
 #include <DSConfiguration.h>
 #include <DSMySQLQuery.h>
+#include <wx/jsonval.h>
+#include <wx/jsonwriter.h>
 #include "Configuration.h"
 
 StatisticsWeb::StatisticsWeb(
@@ -38,7 +40,11 @@ int StatisticsWeb::Run() {
 	if(!init) {
 		SetStringContent(_N("Could not init"));
 	} else {
-		Build();
+		const wxString action(GetCgi()->rq[_N("action")]);
+		if(action == _N("json"))
+			JSON();
+		else
+			Web();
 	}
 	
 	return 0;
@@ -50,7 +56,9 @@ DSTemplate StatisticsWeb::CreateTemplate(const wxString &filename) {
 	return tpl;
 }
 
-void StatisticsWeb::Build() {
+void StatisticsWeb::Web() {
+	SetContentType(_N("Content-type: text/html\r\nCache-Control: no-cache\r\n"));
+
 	DSTemplate indexTemplate(CreateTemplate(_N("index.tpl")));
 
 	indexTemplate.SetVariable(_N("websiteName"), websiteName);
@@ -69,6 +77,31 @@ void StatisticsWeb::Build() {
 
 	indexTemplate.Parse();
 	SetStringContent(indexTemplate.Get());
+}
+
+void StatisticsWeb::JSON() {
+	SetContentType(_N("Content-type: application/json\r\nCache-Control: no-cache\r\n"));
+	
+	wxJSONValue root;
+	root[_N("websiteName")] = websiteName;
+
+	wxJSONValue entry;
+
+	DSMySQLQuery query(&db);
+	query.Query(_N("SELECT * FROM statistics"));
+	while(query.NextRecord()) {
+		entry[_N("title")] = query.GetField(_N("title")).ToString();
+		entry[_N("counter")] = query.GetField(_N("counter")).ToString();
+
+		root[_N("entries")].Append(entry);
+	}
+	query.FreeResult();
+
+	wxJSONWriter writer(wxJSONWRITER_NONE);
+	wxString jsonContent;
+	writer.Write(root, jsonContent);
+
+	SetStringContent(jsonContent);
 }
 
 IMPLEMENT_WEB(StatisticsWeb, statisticsWeb)

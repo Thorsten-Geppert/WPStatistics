@@ -23,7 +23,8 @@ class StatisticsWeb : public DSWeb {
 		DSMySQLDatabase db;
 		
 		DSTemplate CreateTemplate(const wxString &filename);
-		void Build();
+		void Web();
+		void JSON();
 
 
 

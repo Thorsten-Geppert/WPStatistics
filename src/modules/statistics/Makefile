@@ -2,9 +2,9 @@ CXX     = c++
 LINK    = c++
 WEBROOT = /server/web/tgeppert/statistics
 OBJECTS = StatisticsWeb.o
-INCPATH = -I /usr/local/include -I /usr/include -I /usr/local/include/mysql
-LIBPATH = -L /usr/local/lib -L /usr/lib
-LIBS    = -l fcgi -lds
+INCPATH = -I /usr/local/include -I /usr/include -I /usr/local/include/mysql -I /usr/local/wxJSON/include
+LIBPATH = -L /usr/local/lib -L /usr/lib -L /usr/local/wxJSON/lib
+LIBS    = -l fcgi -lds -l wxcode_gtk2u_wxjson-2.8
 
 TARGET  = index.ds
 
